@@ -1,0 +1,42 @@
+###
+GET http://localhost:3001/pets
+
+###
+POST http://localhost:3001/pets/new
+Content-Type: application/json
+
+{
+    "petName" : "Lemniscate",
+    "petDescription" : "A cuddly little noodle! So pretty and lovely <3" 
+}
+
+###
+POST http://localhost:3001/pets/new
+Content-Type: application/json
+
+{
+    "petName" : "Sci-fi",
+    "petDescription" : "An American hairless terrier! Pretty mom!"
+}
+
+###
+GET http://localhost:3001/feed
+
+###
+POST http://localhost:3001/feed/new
+Content-Type: application/json
+
+{
+    "feedName" : "120g rat",
+    "portionsLeft" : 20
+}
+
+###
+POST http://localhost:3001/feed/
+
+###
+DELETE http://localhost:3001/pets/DELETE 
+Content-Type: application/json
+{
+    "id" : "64d53469281b306632b0efc8"
+}
