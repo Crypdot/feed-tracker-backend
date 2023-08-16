@@ -35,8 +35,4 @@ Content-Type: application/json
 POST http://localhost:3001/feed/
 
 ###
-DELETE http://localhost:3001/pets/DELETE 
-Content-Type: application/json
-{
-    "id" : "64d53469281b306632b0efc8"
-}
+DELETE http://localhost:3001/pets/delete/64d5360aecf1677cf6f497a5
