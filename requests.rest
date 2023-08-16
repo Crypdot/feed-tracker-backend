@@ -11,13 +11,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3001/pets/new
-Content-Type: application/json
-
-{
-    "petName" : "Sci-fi",
-    "petDescription" : "An American hairless terrier! Pretty mom!"
-}
+GET http://localhost:3001/pets/64c78bfaafde0258b4364312
 
 ###
 GET http://localhost:3001/feed
@@ -27,12 +21,23 @@ POST http://localhost:3001/feed/new
 Content-Type: application/json
 
 {
-    "feedName" : "120g rat",
+    "feedName" : "85g rat",
     "portionsLeft" : 20
 }
 
 ###
-POST http://localhost:3001/feed/
+DELETE http://localhost:3001/pets/delete/64d5360aecf1677cf6f497a5
 
 ###
-DELETE http://localhost:3001/pets/delete/64d5360aecf1677cf6f497a5
+GET http://localhost:3001/feedingEvents/
+
+###
+POST http://localhost:3001/feedingEvents/new/
+Content-Type: application/json
+
+{
+    "petId" : "64dcb02280fcb411fa8a9c02",
+    "feedId" : "64dcb190e05d938ae44f4661",
+    "portionsFed" : 18,
+    "feedingEventDescription" : "A brand new feeding for a freshly shed snake! And again!"
+}

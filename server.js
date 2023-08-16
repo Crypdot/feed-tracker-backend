@@ -1,7 +1,6 @@
 /** To do */
 /** Make sure that adding a type of feed and pet is easy */
-/** Ensure that a feeding event can't be created if neither the pet or the feed exists => Handle the error gracefully! */
-/** Ensure that when a feeding event occurs, the right number of feed is removed from the fridge! */
+/** Add request to delete all events, pets, feed, etc. Blank slate should be achievable*/
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -96,14 +95,14 @@ app.get('/pets/:id', async (req, res) => {
 })
 
 // Creates a new Feed!
-app.post('/feed/new', (req, res) => {
+app.post('/feed/new', async (req, res) => {
     try {
         const feed = new Feed({
-            feedName: req.body.feedName,
+            name: req.body.feedName,
             portionsLeft: req.body.portionsLeft,
-        });
+        }); 
 
-        const savedFeed = feed.save();
+        const savedFeed = await feed.save();
         res.status(201).json(savedFeed);
 
     } catch (error) {
@@ -150,24 +149,58 @@ app.post('/feed/update/:id', async (req, res) => {
     }
 });
 
-// Needs to be more robust:
-// Requires checking if a feed/pet exists -> If not, return an error
-// Requires removing the indicated amount of feed from the "fridge"
-app.post('feedingEvents/new', async (req, res) =>{
+async function updateFeed(feedId, portionsToSubtract){
+    const feedToUpdate = await Feed.findById(feedId);
+    var feedLeft = feedToUpdate.portionsLeft;
 
-    //Does the Pet exist?
-    //Does the Feed exist?
-    //Subtract req.params.quantity
+    
+    feedLeft -= portionsToSubtract;
+
+    console.log("FEED LEFT ::: ", feedLeft);
+    if((feedLeft - portionsToSubtract) <= 0){
+        feedLeft = 0
+    }
+
+    await Feed.findByIdAndUpdate(feedId, {portionsLeft: feedLeft});
+}
+
+// Fetches all feeding events!
+app.get('/feedingEvents', async(req, res) => {
+    const feedingEvents = await FeedingEvent.find();
+    res.json(feedingEvents);
+});
+  
+app.post('/feedingEvents/new', async (req, res) =>{
+    const pet = await Pet.findById(req.body.petId);
+    const feed = await Feed.findById(req.body.feedId);
+
+    console.log(pet);
+
+    if(!pet){
+        console.log("PET NOT FOUND");
+        return res.status(404).json({error: "Pet not found!"});
+    }
+
+    if(!feed){
+        console.log("Feed not found");
+        return res.status(404).json({error: "Feed not found"});
+    }
 
     try {
-        const feedingEvent = new FeedingEvent({
-            pet: req.body.petId,
-            feed: req.body.feedId,
-            feedingEventDescription: req.body.feedingEventDescription,
-            feedingTime: req.body.feedingTime
-        })
+        const feedingEvent = new FeedingEvent();
+        feedingEvent.pet = req.body.petId;
+        feedingEvent.feed = req.body.feedId;
+        
+        feedingEvent.portionsFed = req.body.portionsFed;
+        
+        if(req.body.feedingEventDescription) {
+            feedingEvent.feedingEventDescription = req.body.feedingEventDescription;
+        }
         
         const savedFeedingEvent = feedingEvent.save();
+
+        updateFeed(req.body.feedId, req.body.portionsFed);
+
         res.status(201).json(savedFeedingEvent);
 
     } catch (error) {

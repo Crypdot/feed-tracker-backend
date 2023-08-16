@@ -9,10 +9,6 @@ const petSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true
-    },
-    feed: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Feed'
     }
 });
 

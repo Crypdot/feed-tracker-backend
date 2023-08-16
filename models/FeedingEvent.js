@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const feedingEventSchema = new mongoose.Schema({
     pet: {
@@ -6,9 +7,13 @@ const feedingEventSchema = new mongoose.Schema({
         ref: 'Pet',
         required: true
     },
-    portionFed: {
+    feed: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Feed',
+        required: true
+    },
+    portionsFed: {
+        type: Number,
         required: true
     },
     feedingTime: {

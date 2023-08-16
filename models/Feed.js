@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
 const feedSchema = new mongoose.Schema({
-    feedName: {
+    name: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     portionsLeft: {
         type: Number,
