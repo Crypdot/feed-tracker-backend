@@ -80,8 +80,18 @@ app.post('/pets/update/:id', async (req, res) => {
         res.status(200).json(updatedPet);
 
     } catch (error) {
-        console.error('!!! Error updating the Pet:', error);
+        console.error('!!! Error updating the Pet: ', error);
         res.status(500).json({error: 'Failed to update the Pet'});
+    }
+})
+
+app.get('/pets/:id', async (req, res) => {
+    try{
+        const petFound = await Pet.findById(req.params.id);
+        res.status(200).json(petFound);
+    }catch (error) {
+        console.error('!!! Error finding pet: ', error)
+        res.status(404).json({error: 'Failed to find the Pet indicated'});
     }
 })
 
@@ -113,6 +123,16 @@ app.delete('/feed/delete/:id', async (req, res) => {
     }
 });
 
+app.get('/feed/:id', async (req, res) => {
+    try{
+        const feedFound = await Feed.findById(req.params.id);
+        res.status(200).json(feedFound);
+    }catch (error) {
+        console.error('!!! Error finding Feed');
+        res.status(404).json({error: 'Failed to find the Feed'});
+    }
+})
+
 // Updates a Feed with a given ID.
 app.post('/feed/update/:id', async (req, res) => {
     try{
@@ -130,8 +150,15 @@ app.post('/feed/update/:id', async (req, res) => {
     }
 });
 
-
+// Needs to be more robust:
+// Requires checking if a feed/pet exists -> If not, return an error
+// Requires removing the indicated amount of feed from the "fridge"
 app.post('feedingEvents/new', async (req, res) =>{
+
+    //Does the Pet exist?
+    //Does the Feed exist?
+    //Subtract req.params.quantity
+
     try {
         const feedingEvent = new FeedingEvent({
             pet: req.body.petId,
