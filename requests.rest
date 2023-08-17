@@ -41,3 +41,6 @@ Content-Type: application/json
     "portionsFed" : 2,
     "feedingEventDescription" : "A brand new feeding for a freshly shed snake! And again!"
 }
+
+###
+GET http://localhost:3001/pets/feedingEvents
