@@ -36,8 +36,8 @@ POST http://localhost:3001/feedingEvents/new/
 Content-Type: application/json
 
 {
-    "petId" : "64dcb02280fcb411fa8a9c02",
-    "feedId" : "64dcb190e05d938ae44f4661",
-    "portionsFed" : 18,
+    "petId" : "64de1571d6ba6d3aa1c84a1c",
+    "feedId" : "64de157fd6ba6d3aa1c84a20",
+    "portionsFed" : 2,
     "feedingEventDescription" : "A brand new feeding for a freshly shed snake! And again!"
 }
