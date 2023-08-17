@@ -13,6 +13,7 @@ const app = express();
 const Pet = require('./models/Pet');
 const Feed = require('./models/Feed');
 const FeedingEvent = require('./models/FeedingEvent');
+const Schema = mongoose.Schema;
 
 app.use(express.json());
 app.use(cors());
@@ -50,16 +51,7 @@ app.get('/pets', async(req, res) => {
     res.json(pets);
 });
 
-// Fetches a pet specified by its ID
-app.get('/pets/:id', async (req, res) => {
-    try{
-        const petFound = await Pet.findById(req.params.id);
-        res.status(200).json(petFound);
-    }catch (error) {
-        console.error('!!! Error finding pet: ', error)
-        res.status(404).json({error: 'Failed to find the Pet indicated'});
-    }
-});
+
 
 // Updates a Pet with a given ID.
 app.post('/pets/update/:id', async (req, res) => {
@@ -89,63 +81,54 @@ app.delete('/pets/delete/:id', async (req, res) => {
     } 
 });
 
-// !!! TO DO ::: all feeding events related to a Pet specified by its ID
+// Finds all feeding events per specific Pet
 app.get('/pets/feedingEvents/', async (req, res) => {
+    // Ensure the Pet exists
+    const pet = await Pet.findById(req.body.petId);
 
-    //64de25def06275b5763c9e49
-    let petId = "64de1571d6ba6d3aa1c84a1c";
+    if(!pet){
+        res.status(404).json({message: "Pet not found!"});
+    }
 
-    FeedingEvent.aggregate([
-        {
-            $match: {
-                pet: mongoose.Types.ObjectId(petId)
+
+    Pet.aggregate([
+    {
+        $match: {
+            _id: pet._id // Replace with the actual ObjectId
             }
+    },
+    {
+        $lookup: {
+        from: "feedingevents",
+        localField: "_id",
+        foreignField: "petId",
+        as: "feedingevents"
         }
+    },
+    {
+        $unwind: "$feedingevents"
+    }
     ])
-    .exec((error, aggregatedFeedingEvents) => {
-        if(error) {
-            console.error(error);
-            return;
-        }
-    console.log(aggregatedFeedingEvents)
+    .exec()
+    .then(aggregatedPet => {
+        console.log(aggregatedPet);
+        res.status(200).json(aggregatedPet);
     })
-
-
-   /*
-    let feed = await Feed.aggregate([ 
-    { '$lookup': {
-        'from': FeedingEvent.collection.name,
-        'let': { 'id': '$_id' },
-        'pipeline': [
-          { '$match': {
-            '$expr': { '$eq': [ '$$id', '$feedId' ] }
-          }},
-          { '$lookup': {
-            'from': Pet.collection.name,
-            'let': { 'petId': '$petId' },
-            'pipeline': [
-              { '$match': {
-                '$expr': { '$eq': [ '$_id', '$$petId' ] }
-              }}
-            ],
-            'as': 'pets'
-          }},
-          { '$unwind': '$pets' },
-          { '$replaceRoot': { 'newRoot': '$pets' } }
-        ],
-        'as': 'pets'
-      }}
-]);
-
-console.log(feed)
-
-*/
-
-console.log(feedingEvents);
+    .catch(error => {
+        console.error("Error:", error);
+    });
 });
 
-
-
+// Fetches a pet specified by its ID
+app.get('/pets/:id', async (req, res) => {
+    try{
+        const petFound = await Pet.findById(req.params.id);
+        res.status(200).json(petFound);
+    }catch (error) {
+        console.error('!!! Error finding pet: ', error)
+        res.status(404).json({error: 'Failed to find the Pet indicated'});
+    }
+});
 
 /** Feed related requests */
 
@@ -160,14 +143,6 @@ app.get('/feed', async (req, res) =>{
         res.status(500).json({error: 'Something went wrong searching for all the feed!'});
     }
 });
-
-
-
-
-
-
-
-
 
 // Creates a new Feed!
 app.post('/feed/new', async (req, res) => {
@@ -186,7 +161,7 @@ app.post('/feed/new', async (req, res) => {
     } 
 });
 
-// Deletes a Feed with a given ID.app.get('/pets/feedingEvents/:id', async (req, res) => {
+// Deletes a Feed with a given ID
 app.delete('/feed/delete/:id', async (req, res) => {
     try {
         const result = await Feed.findByIdAndDelete(req.params.id);
@@ -237,7 +212,7 @@ async function updateFeed(feedId, portionsToSubtract) {
     }
 
     await Feed.findByIdAndUpdate(feedId, {portionsLeft: feedLeft});
-}
+};
 
 // Fetches all feeding events!
 app.get('/feedingEvents', async(req, res) => {
@@ -284,7 +259,5 @@ app.post('/feedingEvents/new', async (req, res) =>{
         res.status(500).json({error: 'Failed to add a new FeedingEvent'});
     }
 });
-
-
 
 app.listen(3001, () => console.log('Server started on port 3001!'));

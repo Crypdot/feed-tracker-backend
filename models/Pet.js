@@ -15,10 +15,10 @@ const petSchema = new mongoose.Schema({
     toJson: { virtuals: true }
 });
 
-petSchema.virtual('feedingevents', {
-    ref: 'FeedingEvents',
+petSchema.virtual('FeedingEvent', {
+    ref: 'FeedingEvent',
     localField: '_id',
-    foreignField: 'feedId'
+    foreignField: 'petId'
 })
 
 const Pet = mongoose.model('Pet', petSchema);

@@ -11,7 +11,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3001/pets/64c78bfaafde0258b4364312
+GET http://localhost:3001/pets/64de1571d6ba6d3aa1c84a1c
 
 ###
 GET http://localhost:3001/feed
@@ -44,3 +44,8 @@ Content-Type: application/json
 
 ###
 GET http://localhost:3001/pets/feedingEvents
+Content-Type: application/json
+
+{
+    "petId" : "64de1571d6ba6d3aa1c84a1c"
+}
