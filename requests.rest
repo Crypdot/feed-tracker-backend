@@ -39,7 +39,7 @@ Content-Type: application/json
     "petId" : "64de1571d6ba6d3aa1c84a1c",
     "feedId" : "64de157fd6ba6d3aa1c84a20",
     "portionsFed" : 2,
-    "feedingEventDescription" : "A brand new feeding for a freshly shed snake! And again!"
+    "feedingEventDescription" : "A new feeding!"
 }
 
 ###
