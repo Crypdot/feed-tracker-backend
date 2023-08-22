@@ -21,8 +21,8 @@ POST http://localhost:3001/feed/new
 Content-Type: application/json
 
 {
-    "feedName" : "85g rat",
-    "portionsLeft" : 20
+    "feedName" : "120g rat",
+    "portionsLeft" : 10
 }
 
 ###
@@ -37,7 +37,7 @@ Content-Type: application/json
 
 {
     "petId" : "64de1571d6ba6d3aa1c84a1c",
-    "feedId" : "64de157fd6ba6d3aa1c84a20",
+    "feedId" : "64e4704cf274757a86323b00",
     "portionsFed" : 2,
     "feedingEventDescription" : "A new feeding!"
 }
@@ -46,6 +46,14 @@ Content-Type: application/json
 GET http://localhost:3001/pets/feedingEvents
 Content-Type: application/json
 
+{
+    "petId" : "64de1571d6ba6d3aa1c84a1c"
+}
+
+###
+DELETE http://localhost:3001/feedingEvents/deleteByPetId/
+
+Content-Type: application/application/json
 {
     "petId" : "64de1571d6ba6d3aa1c84a1c"
 }

@@ -1,8 +1,6 @@
 /** To do */
 /** Make sure that adding a type of feed and pet is easy */
 /** Add request to delete all events, pets, feed, etc. Blank slate should be achievable */
-/** Add method to request all feeding events for a specific pet */
-
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -50,7 +48,6 @@ app.get('/pets', async(req, res) => {
     const pets = await Pet.find();
     res.json(pets);
 });
-
 
 
 // Updates a Pet with a given ID.
@@ -221,7 +218,7 @@ app.get('/feedingEvents', async(req, res) => {
 });
   
 // Creates a new feeding event in the database
-app.post('/feedingEvents/new', async (req, res) =>{
+app.post('/feedingEvents/new', async (req, res) => {
     const pet = await Pet.findById(req.body.petId);
     const feed = await Feed.findById(req.body.feedId);
     
@@ -257,6 +254,33 @@ app.post('/feedingEvents/new', async (req, res) =>{
     } catch (error) {
         console.error('!!! Error adding a new Feeding Event', error);
         res.status(500).json({error: 'Failed to add a new FeedingEvent'});
+    }
+});
+
+// This method should delete all feeding events belonging to a specific pet, as specified by the petId
+app.delete('/feedingEvents/deleteByPetId/', async (req, res) => {
+    console.log("Testing! The ID given was: ", req.body.petId);
+    const pet = await Pet.findById(req.body.petId);
+
+    console.log("Found the pet! -> ", pet.petName);
+
+    if(!pet){
+        console.log("Pet not found");
+        return res(404).json({error: "Pet not found!"});
+    }
+
+    try {
+        //Here we need to delete all feeding events that correspond to this pet!
+        FeedingEvent.deleteMany({petId : { $match: req.params.id }})
+            .then(function() {
+                console.log("Feeding events deleted");
+            }).catch(function(error){
+                console.log(error)
+            });
+
+    } catch (Error) {
+        console.error("!!! Something went wrong deleting pet's feeding events!");
+        return res(500).json({error: "Something went wrong deleting the pet's feeding events."});
     }
 });
 
