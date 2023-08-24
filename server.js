@@ -51,7 +51,7 @@ app.post('/pets/update/:id', async (req, res) => {
         petToUpdate.name = req.body.petName;
         petToUpdate.description = req.body.petDescription;
 
-        const updatedPet = petToUpdate.save();
+        const updatedPet = await petToUpdate.save();
         res.status(200).json(updatedPet);
 
     } catch (error) {
@@ -83,7 +83,7 @@ app.get('/pets/feedingEvents/', async (req, res) => {
 
     // An aggregate function with the purpose of finding all feeding events relating to this specific pet
     // It collects every feeding event, and additionally projects the event's feed name for easier debugging
-    Pet.aggregate([
+    await Pet.aggregate([
     {
         $match: {
             _id: pet._id
@@ -207,12 +207,19 @@ app.get('/feed/:id', async (req, res) => {
 app.post('/feed/update/:id', async (req, res) => {
     try{
         const feedToUpdate = await Feed.findById(req.params.id);
-        if(!feedToUpdate) { return res.status(400); }
+        const updatedFeedName = req.body.feedName;
+        if(!feedToUpdate) { return res.status(404).json({ error: 'Failed to find the Feed to update.' }); }
+        
+        if(!req.body.portionsLeft) { return res.status(400).json({ error: 'Please indicate the portions left'} )};
 
-        feedToUpdate.feedName = req.body.feedName;
+        if(!updatedFeedName) {
+            updatedName = feedToUpdate.feedName;
+        }
+
+        feedToUpdate.feedName = updatedFeedName;
         feedToUpdate.portionsLeft = req.body.portionsLeft;
 
-        const updatedFeed = feedToUpdate.save();
+        const updatedFeed = await feedToUpdate.save();
         res.status(200).json(updatedFeed);
     } catch (error) {
         console.error('!!! Error updated Feed: ', error);

@@ -26,6 +26,15 @@ Content-Type: application/json
 }
 
 ###
+POST http://localhost:3001/feed/update/64e4704cf274757a86323b00
+Content-Type: application/json
+
+{
+    "feedName" : "120g rat",
+    "portionsLeft" : 10
+}
+
+###
 DELETE http://localhost:3001/pets/delete/64d5360aecf1677cf6f497a5
 
 ###
