@@ -1,5 +1,3 @@
-/** To do */
-
 const express = require('express');
 const mongoose = require('mongoose');
 mongoose.set('debug', true);
@@ -20,7 +18,6 @@ const conn = mongoose.connect('mongodb://127.0.0.1:27017/feed-tracker', {
 })
     .then(() => console.log('Connected to the database successfully!'))
     .catch(console.error());
-
 
 /** Pet related requests */
 
