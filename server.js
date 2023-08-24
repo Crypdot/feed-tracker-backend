@@ -78,7 +78,7 @@ app.delete('/pets/delete/:id', async (req, res) => {
     } 
 });
 
-// Finds all feeding events per specific Pet
+// Finds all feeding events per specific Pet. This includes the feed's ID and name used in the feeding event.
 app.get('/pets/feedingEvents/', async (req, res) => {
     // Ensure the Pet exists
     const pet = await Pet.findById(req.body.petId);
@@ -87,11 +87,12 @@ app.get('/pets/feedingEvents/', async (req, res) => {
         res.status(404).json({message: "Pet not found!"});
     }
 
-
+    // An aggregate function with the purpose of finding all feeding events relating to this specific pet
+    // It collects every feeding event, and additionally projects the event's feed name for easier debugging
     Pet.aggregate([
     {
         $match: {
-            _id: pet._id // Replace with the actual ObjectId
+            _id: pet._id
             }
     },
     {
@@ -104,6 +105,33 @@ app.get('/pets/feedingEvents/', async (req, res) => {
     },
     {
         $unwind: "$feedingevents"
+    },
+    {
+        $lookup: {
+            from: "feeds",
+            localField: "feedingevents.feedId",
+            foreignField: "_id",
+            as: "feedInfo"
+        }
+    },
+    {
+        $unwind: "$feedInfo"
+    },
+    {
+        $project: {
+            _id: 1,
+            name: 1,
+            description: 1,
+            feedingevents: {
+                _id: "$feedingevents._id",
+                feedId: "$feedingevents.feedId",
+                petId: "$feedingevents.petId",
+                portionsFed: "$feedingevents.portionsFed",
+                feedingEventDescription: "$feedingevents.feedingEventDescription",
+                feedingTime: "$feedingevents.feedingTime",
+                feedName: "$feedInfo.name"
+            }
+        }
     }
     ])
     .exec()
@@ -257,30 +285,26 @@ app.post('/feedingEvents/new', async (req, res) => {
     }
 });
 
-// This method should delete all feeding events belonging to a specific pet, as specified by the petId
-app.delete('/feedingEvents/deleteByPetId/', async (req, res) => {
-    console.log("Testing! The ID given was: ", req.body.petId);
-    const pet = await Pet.findById(req.body.petId);
-
-    console.log("Found the pet! -> ", pet.petName);
-
-    if(!pet){
-        console.log("Pet not found");
-        return res(404).json({error: "Pet not found!"});
-    }
+// Deletes all feeding events related to a pet specified by its ID
+app.delete('/feedingEvents/deleteByPetId', async (req, res) => {
+    const petId = req.body.petId;
 
     try {
+        const pet = await Pet.findById(petId);
+
+        if(!pet){
+            console.log("Pet not found");
+            return res.status(404).json({error: "Pet not found!"});
+        }
+
         //Here we need to delete all feeding events that correspond to this pet!
-        FeedingEvent.deleteMany({petId : { $match: req.params.id }})
-            .then(function() {
-                console.log("Feeding events deleted");
-            }).catch(function(error){
-                console.log(error)
-            });
+        await FeedingEvent.deleteMany({ petId: pet._id});
+        console.log("Feeding events related to ", pet.petName, " deleted.");
+        return res.status(200).json({ message: "Feeding events deleted successfully."});
 
     } catch (Error) {
         console.error("!!! Something went wrong deleting pet's feeding events!");
-        return res(500).json({error: "Something went wrong deleting the pet's feeding events."});
+        return res.status(500).json({error: "Something went wrong deleting the pet's feeding events."});
     }
 });
 
