@@ -1,6 +1,4 @@
 /** To do */
-/** Make sure that adding a type of feed and pet is easy */
-/** Add request to delete all events, pets, feed, etc. Blank slate should be achievable */
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -48,7 +46,6 @@ app.get('/pets', async(req, res) => {
     const pets = await Pet.find();
     res.json(pets);
 });
-
 
 // Updates a Pet with a given ID.
 app.post('/pets/update/:id', async (req, res) => {
@@ -157,6 +154,7 @@ app.get('/pets/:id', async (req, res) => {
 
 /** Feed related requests */
 
+// Returns all feeds found in the database
 app.get('/feed', async (req, res) =>{
     try{
         const feed = await Feed.find();
@@ -197,6 +195,7 @@ app.delete('/feed/delete/:id', async (req, res) => {
     }
 });
 
+// Finds a feed by its given ID
 app.get('/feed/:id', async (req, res) => {
     try{
         const feedFound = await Feed.findById(req.params.id);
@@ -224,6 +223,7 @@ app.post('/feed/update/:id', async (req, res) => {
     }
 });
 
+// Helper function to update a feed. Primarily used when adding a feeding event and we want to subtract some number of feed from the database
 async function updateFeed(feedId, portionsToSubtract) {
     const feedToUpdate = await Feed.findById(feedId);
     var feedLeft = feedToUpdate.portionsLeft;
@@ -239,6 +239,8 @@ async function updateFeed(feedId, portionsToSubtract) {
     await Feed.findByIdAndUpdate(feedId, {portionsLeft: feedLeft});
 };
 
+/** Feeding event related requests */
+
 // Fetches all feeding events!
 app.get('/feedingEvents', async(req, res) => {
     const feedingEvents = await FeedingEvent.find();
@@ -246,6 +248,7 @@ app.get('/feedingEvents', async(req, res) => {
 });
   
 // Creates a new feeding event in the database
+// It will also request updateFeed() to update the number of feed left in the database
 app.post('/feedingEvents/new', async (req, res) => {
     const pet = await Pet.findById(req.body.petId);
     const feed = await Feed.findById(req.body.feedId);
